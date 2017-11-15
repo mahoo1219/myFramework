@@ -1,14 +1,13 @@
 package org.mahoo.framework.proxy;
 
 import net.sf.cglib.proxy.MethodProxy;
-import org.mahoo.framework.util.ClassUtil;
 
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.List;
 
 /**
- *
+ * 代理链
  */
 public class ProxyChain {
     private final Class<?> targetClass;
@@ -27,5 +26,28 @@ public class ProxyChain {
         this.methodProxy = methodProxy;
         this.methodParams = methodParams;
         this.proxyList = proxyList;
+    }
+
+    public Class<?> getTargetClass() {
+        return targetClass;
+    }
+
+    public Method getTargetMethod() {
+        return targetMethod;
+    }
+
+
+    public Object[] getMethodParams() {
+        return methodParams;
+    }
+
+    public Object doProxyChain() throws Throwable {
+        Object methodResult;
+        if (proxyIndex < proxyList.size()) {
+            methodResult = proxyList.get(proxyIndex++).doProxy(this);
+        } else {
+            methodResult = methodProxy.invokeSuper(targetObject, methodParams);
+        }
+        return methodResult;
     }
 }
